@@ -345,6 +345,7 @@ cdef class DiscreteDistribution(Distribution):
 		d = DiscreteDistribution(Xs)
 		return d
 
+	# Calling this method produces segmentation fault. dtype cannot be identified.
 	@classmethod
 	def blank(cls):
 		return DiscreteDistribution({})

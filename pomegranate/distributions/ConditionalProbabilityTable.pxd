@@ -10,6 +10,7 @@ cdef class ConditionalProbabilityTable(MultivariateDistribution):
 	cdef double* values
 	cdef double* counts
 	cdef double* marginal_counts
+	# n is the number of entries in the CPT, k is the cardinality of the variable.
 	cdef int n, k
 	cdef public int n_columns
 	cdef int* idxs
@@ -19,6 +20,7 @@ cdef class ConditionalProbabilityTable(MultivariateDistribution):
 	cdef public list parents, parameters, dtypes
 	cdef public object keymap
 	cdef public object marginal_keymap
+	# m is the number of parents
 	cdef public int m
 	cdef void __summarize(self, items, double [:] weights)
 

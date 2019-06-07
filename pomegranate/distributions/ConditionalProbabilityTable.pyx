@@ -24,6 +24,9 @@ from collections import OrderedDict
 
 from .JointProbabilityTable import JointProbabilityTable
 
+from pprint import pprint
+import sys
+
 cdef class ConditionalProbabilityTable(MultivariateDistribution):
 	"""
 	A conditional probability table, which is dependent on values from at
@@ -36,7 +39,6 @@ cdef class ConditionalProbabilityTable(MultivariateDistribution):
 		Take in the distribution represented as a list of lists, where each
 		inner list represents a row.
 		"""
-
 		self.name = "ConditionalProbabilityTable"
 		self.frozen = False
 		self.m = len(parents)
@@ -84,6 +86,50 @@ cdef class ConditionalProbabilityTable(MultivariateDistribution):
 		self.marginal_keymap = OrderedDict(marginal_keys)
 		self.parents = parents
 		self.parameters = [table, self.parents]
+
+		print("m = " + str(self.m))
+		print("n = " + str(self.n))
+		print("k = " + str(self.k))
+
+		sys.stdout.write("idxs = [" + str(self.idxs[0]))
+		for i in range(1, self.m+1):
+			sys.stdout.write(", " + str(self.idxs[i]))
+		print("]")
+
+		sys.stdout.write("marginal_idxs = [" + str(self.marginal_idxs[0]))
+		for i in range(1, self.m):
+			sys.stdout.write(", " + str(self.marginal_idxs[i]))
+		print("]")
+
+		sys.stdout.write("values = [" + str(self.values[0]))
+		for i in range(1, self.n):
+			sys.stdout.write(", " + str(self.values[i]))
+		print("]")
+
+		sys.stdout.write("counts = [" + str(self.counts[0]))
+		for i in range(1, self.n):
+			sys.stdout.write(", " + str(self.counts[i]))
+		print("]")
+
+		sys.stdout.write("marginal_counts = [" + str(self.marginal_counts[0]))
+		for i in range(1, self.m+1):
+			sys.stdout.write(", " + str(self.marginal_counts[i]))
+		print("]")
+
+		print("column_idxs = " + str(self.column_idxs))
+
+		sys.stdout.write("column_idxs_ptr = [" + str(self.column_idxs_ptr[0]))
+		for i in range(1, self.m+1):
+			sys.stdout.write(", " + str(self.column_idxs_ptr[i]))
+		print("]")
+
+		print("n_columns = " + str(self.n_columns))
+		print("dtypes = " + str(self.dtypes))
+		print("keymap = " + str(self.keymap))
+		print("marginal_keymap = " + str(self.marginal_keymap))
+		print("parents = " + str(self.parents))
+		print("parameters = " + str(self.parameters))
+		# print("idx = [" + str(self.k))
 
 	def __dealloc__(self):
 		free(self.idxs)
@@ -161,6 +207,7 @@ cdef class ConditionalProbabilityTable(MultivariateDistribution):
 			return sample_cands[sample_ind]
 		else:
 			states = random_state.randint(1000000, size=n)
+			# FIXME: This implementation could be potentially improved. It is not necessary to recursively call sample.
 			return [self.sample(parent_values, n=None, random_state=state)
 				for state in states]
 
@@ -235,7 +282,7 @@ cdef class ConditionalProbabilityTable(MultivariateDistribution):
 		# Convert from a dictionary to a list if necessary
 		if isinstance(neighbor_values, dict):
 			neighbor_values = [neighbor_values.get(d, None) for d in self.parents]
-
+		print(neighbor_values)
 		# Get the index we're marginalizing over
 		i = -1 if neighbor_values == None else neighbor_values.index(None)
 		return self.joint(neighbor_values).marginal(i)
